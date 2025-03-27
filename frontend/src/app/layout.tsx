@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { Inter, Roboto } from "next/font/google";  // Use Inter or any valid font
+import { Inter, Roboto } from "next/font/google"; // Correct fonts from Google
 import "./globals.css";
 
-// Replace Geist and Geist_Mono with Inter or any other font
+// Replace Geist and Geist_Mono with valid fonts like Inter or Roboto
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
@@ -11,6 +11,7 @@ const inter = Inter({
 const roboto = Roboto({
   variable: "--font-roboto",
   subsets: ["latin"],
+  weight: ['400', '700'],  // Specify weights for Roboto font
 });
 
 export const metadata: Metadata = {
@@ -26,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.variable} ${roboto.variable} antialiased`}  // Use the updated font classes here
+        className={`${inter.variable} ${roboto.variable} antialiased`}  // Make sure to use these updated fonts
       >
         {children}
       </body>
