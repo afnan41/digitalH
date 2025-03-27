@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
+import path from 'path';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -8,6 +9,14 @@ const prisma = new PrismaClient();
 // Middlewares
 app.use(cors());
 app.use(express.json()); 
+
+// Serve static files from 'public' folder
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Root route (homepage)
+app.get('/', (req: Request, res: Response) => {
+  res.send('Welcome to the DigitalH User Management API!');
+});
 
 // Create a new user
 app.post('/users', async (req: Request, res: Response) => {
