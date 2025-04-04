@@ -1,0 +1,81 @@
+# 🧑‍💼 User Management System
+
+A full-stack **User Management System** built with **Next.js 15 (App Router)** for the frontend and **Express.js + Prisma + PostgreSQL** for the backend.
+
+---
+
+## 🚀 Features
+
+- ✅ Add, view, and delete users
+- 🔍 Real-time search by **User ID**
+- 🖼 Avatar picker with dynamic previews using **DiceBear API**
+- 💡 Responsive UI with **Framer Motion** animations
+- 🎯 Fully validated forms using **Zod + TypeScript**
+- 🧩 Modular component structure with **Shadcn UI**
+- 📅 Stores and displays **user creation date**
+
+---
+
+## 🛠️ Tech Stack
+
+| Frontend        | Backend      | Database   | Others                    |
+|----------------|--------------|------------|---------------------------|
+| Next.js 15      | Express.js   | PostgreSQL | Prisma ORM                |
+| TypeScript      | Node.js      |            | Zod Validation            |
+| Shadcn UI       | REST API     |            | Framer Motion Animations  |
+
+---
+
+## 📂 Project Structure
+digitalH/
+├── frontend/ # Next.js (App Router) 
+│ └── src/ 
+│ └── app/ 
+│ ├── users/ # User list page 
+│ ├── add-user/ # Add user page 
+│ └── layouts/ # Shared layout
+├── backend/ # Express.js + Prisma 
+│ ├── controllers/ 
+│ ├── routes/ 
+│ └── validations/ 
+└── prisma/ # Prisma schema & migrations
+
+
+---
+
+## 🧪 How to Run Locally
+
+### 1️⃣ Clone the Repository
+
+```bash
+git clone https://github.com/afnan41/digitalH.git
+cd digitalH
+
+
+cd backend
+npm install
+npx prisma migrate dev
+npm run dev
+
+
+cd frontend
+npm install
+npm run dev
+
+/*The app will be running on: http://localhost:3000*/
+
+
+
+💡 Notes
+Fully responsive layout across all devices.
+
+Smooth and engaging UI powered by animations.
+
+Modular and maintainable codebase.
+
+RESTful backend built to scale.
+
+
+📹 Demo Video  
+  Watch here → https://drive.google.com/file/d/1tlXFZc-u0pvc89Iq4CvLc2E_tWdxIUJ3/view?usp=sharing
+
