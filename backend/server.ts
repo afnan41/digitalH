@@ -1,84 +1,35 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import cors from 'cors';
-import { PrismaClient } from '@prisma/client';
-import path from 'path';
+import userRoutes from './routes/userRoutes';
 
 const app = express();
-const prisma = new PrismaClient();
-
-// Middlewares
-app.use(cors());
-app.use(express.json()); 
-
-// Serve static files from 'public' folder
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Root route (homepage)
-app.get('/', (req: Request, res: Response) => {
-  res.send('Welcome to the DigitalH User Management API!');
-});
-
-// Create a new user
-app.post('/users', async (req: Request, res: Response) => {
-  const { name, email, bio, avatar } = req.body;
-  try {
-    const newUser = await prisma.user.create({
-      data: { name, email, bio, avatar },
-    });
-    res.status(201).json(newUser);
-  } catch (error) {
-    console.error('Error creating user:', error);
-    res.status(400).json({ error: 'User could not be created' });
-  }
-});
-
-// Get all users
-app.get('/users', async (_req: Request, res: Response) => {
-  try {
-    const users = await prisma.user.findMany();
-    res.json(users);
-  } catch (error) {
-    console.error('Error fetching users:', error);
-    res.status(500).json({ error: 'Could not retrieve users' });
-  }
-});
-
-// Get user by ID
-app.get('/users/:id', async (req: Request, res: Response) => {
-  const { id } = req.params;
-  try {
-    const user = await prisma.user.findUnique({
-      where: { id: Number(id) },
-    });
-    if (user) {
-      res.json(user);
-    } else {
-      res.status(404).json({ error: 'User not found' });
-    }
-  } catch (error) {
-    console.error('Error fetching user by ID:', error);
-    res.status(500).json({ error: 'Could not retrieve user' });
-  }
-});
-
-// Update user by ID
-app.put('/users/:id', async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const { name, email, bio, avatar } = req.body;
-  try {
-    const updatedUser = await prisma.user.update({
-      where: { id: Number(id) },
-      data: { name, email, bio, avatar },
-    });
-    res.json(updatedUser);
-  } catch (error) {
-    console.error('Error updating user:', error);
-    res.status(400).json({ error: 'Could not update user' });
-  }
-});
-
-// Server Start
 const PORT = process.env.PORT || 5000;
+
+// CORS setup
+const corsOptions = {
+  origin: 'http://localhost:3000', // Limit to specific frontend origin
+  methods: 'GET,POST,PUT,DELETE',
+};
+app.use(cors(corsOptions));
+
+// Middleware
+app.use(express.json());
+
+// API Routes
+app.use('/api', userRoutes);
+
+// Health check route
+app.get('/', (_, res) => {
+  res.send('🚀 API is running!');
+});
+
+// Global error handling middleware
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error(err);
+  res.status(500).json({ error: 'Internal Server Error' });
+});
+
+// Start server
 app.listen(PORT, () => {
-  console.log(`✅ Server is running on http://localhost:${PORT}`);
+  console.log(`✅ Server listening on http://localhost:${PORT}`);
 });

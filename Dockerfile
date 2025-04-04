@@ -1,19 +1,18 @@
-# Use the official Node.js image from Docker Hub
-FROM node:16
+FROM node:18
 
-# Set the working directory to /app
+# Set working directory in the container
 WORKDIR /app
 
-# Copy the package.json and package-lock.json to the container
+# Copy package.json and package-lock.json
 COPY backend/package.json backend/package-lock.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 # Copy the rest of the backend files into the container
 COPY backend/ .
 
-# Expose port 5000 (the port your backend listens on)
+# Expose the port that the server will run on
 EXPOSE 5000
 
 # Run the backend server

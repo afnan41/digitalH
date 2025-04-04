@@ -1,92 +1,152 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@/components/ui/dialog';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import MainLayout from '@/components/layouts/MainLayout';
 
-const avatarOptions = [
-  'https://api.dicebear.com/7.x/adventurer/svg?seed=cat',
-  'https://api.dicebear.com/7.x/adventurer/svg?seed=dog',
-  'https://api.dicebear.com/7.x/adventurer/svg?seed=alien',
-  'https://api.dicebear.com/7.x/adventurer/svg?seed=ghost',
-  'https://api.dicebear.com/7.x/adventurer/svg?seed=duck',
-  'https://api.dicebear.com/7.x/adventurer/svg?seed=panda',
-]
+// ✅ Generate more avatars dynamically
+const avatarOptions = Array.from({ length: 24 }, (_, i) =>
+  `https://api.dicebear.com/7.x/adventurer/svg?seed=user${i + 1}`
+);
 
-export default function AddUserPage() {
-  const router = useRouter()
-
-  const [form, setForm] = useState({
-    name: '',
+const AddUserPage = () => {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
     email: '',
+    avatar: '',
     bio: '',
-    avatar: avatarOptions[0] // Default selected avatar
-  })
+  });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
-  }
+  const [successMessage, setSuccessMessage] = useState('');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    const res = await fetch('http://localhost:5000/users', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form)
-    })
-
-    if (res.ok) {
-      router.push('/users')
-    } else {
-      alert('Failed to add user')
+    if (!formData.avatar) {
+      alert('Please select an avatar!');
+      return;
     }
-  }
+
+    try {
+      const res = await fetch('http://localhost:5000/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        console.error(errorData);
+        setSuccessMessage('');
+        return;
+      }
+
+      const newUser = await res.json();
+      setSuccessMessage(`🎉 ${newUser.firstName} ${newUser.lastName} created successfully!`);
+      setFormData({ firstName: '', lastName: '', email: '', avatar: '', bio: '' });
+    } catch (error) {
+      console.error('Error creating user:', error);
+      setSuccessMessage('');
+    }
+  };
+
+  // ❗️ Clear success message after 3 seconds
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(''), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-4 border rounded shadow">
-      <h1 className="text-2xl font-bold mb-4">Add New User</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          name="name"
-          placeholder="Name"
-          className="w-full border rounded px-3 py-2"
-          onChange={handleChange}
-          required
-        />
-        <input
-          name="email"
-          placeholder="Email"
-          className="w-full border rounded px-3 py-2"
-          onChange={handleChange}
-          required
-        />
-        <input
-          name="bio"
-          placeholder="Bio (optional)"
-          className="w-full border rounded px-3 py-2"
-          onChange={handleChange}
-        />
+    <MainLayout>
+      <main className="max-w-xl mx-auto py-10 px-5 w-full">
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle className="text-center">Add New User</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <input type="text" name="firstName" placeholder="First Name" value={formData.firstName} onChange={handleChange} required className="border rounded px-3 py-2" />
+              <input type="text" name="lastName" placeholder="Last Name" value={formData.lastName} onChange={handleChange} required className="border rounded px-3 py-2" />
+              <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} required className="border rounded px-3 py-2" />
+              <textarea name="bio" placeholder="Short Bio (optional)" value={formData.bio} onChange={handleChange} rows={3} className="border rounded px-3 py-2" />
 
-        <div>
-          <label className="block font-medium text-sm mb-1">Choose an Avatar</label>
-          <div className="flex gap-3 flex-wrap">
-            {avatarOptions.map((url) => (
-              <img
-                key={url}
-                src={url}
-                alt="avatar"
-                className={`w-16 h-16 rounded-full border-2 cursor-pointer transition ${
-                  form.avatar === url ? 'border-blue-500 ring-2 ring-blue-400' : 'border-gray-200'
-                }`}
-                onClick={() => setForm({ ...form, avatar: url })}
-              />
-            ))}
-          </div>
-        </div>
+              {/* Avatar picker */}
+              <div className="text-center mt-4">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button variant="outline">
+                      {formData.avatar ? 'Change Avatar' : 'Choose Avatar'}
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Select an Avatar</DialogTitle>
+                    </DialogHeader>
+                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-4 max-h-[300px] overflow-y-auto px-2 py-3">
+                      {avatarOptions.map((url, index) => (
+                        <img
+                          key={index}
+                          src={url}
+                          alt={`Avatar ${index}`}
+                          className={`w-16 h-16 rounded-full border-2 cursor-pointer transition hover:scale-110 ${
+                            formData.avatar === url ? 'border-blue-500' : 'border-transparent'
+                          }`}
+                          onClick={() => setFormData({ ...formData, avatar: url })}
+                        />
+                      ))}
+                    </div>
+                  </DialogContent>
+                </Dialog>
 
-        <Button type="submit" className="w-full">Submit</Button>
-      </form>
-    </div>
-  )
-}
+                {/* Selected avatar preview */}
+                {formData.avatar && (
+                  <div className="mt-4">
+                    <img
+                      src={formData.avatar}
+                      alt="Selected avatar"
+                      className="w-20 h-20 mx-auto rounded-full border border-gray-300"
+                    />
+                  </div>
+                )}
+              </div>
+
+              <Button type="submit" className="w-full mt-4">
+                Create User
+              </Button>
+
+              {/* ✅ Animated Success Message */}
+              {successMessage && (
+                <motion.p
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="text-green-600 text-center mt-2 text-sm"
+                >
+                  {successMessage}
+                </motion.p>
+              )}
+            </form>
+          </CardContent>
+        </Card>
+      </main>
+    </MainLayout>
+  );
+};
+
+export default AddUserPage;

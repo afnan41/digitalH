@@ -120,3 +120,14 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Responsive Navbar Justify Center in Mobile */
+@media (max-width: 600px) {
+  .navbar-links {
+    justify-content: center !important;
+  }
+
+  label span {
+    display: none !important;
+  }
+}
