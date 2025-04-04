@@ -12,7 +12,6 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import MainLayout from '@/components/layouts/MainLayout';
-import Image from 'next/image';
 
 // ✅ Generate more avatars dynamically
 const avatarOptions = Array.from({ length: 24 }, (_, i) =>
@@ -101,18 +100,15 @@ const AddUserPage = () => {
                     </DialogHeader>
                     <div className="grid grid-cols-4 sm:grid-cols-6 gap-4 max-h-[300px] overflow-y-auto px-2 py-3">
                       {avatarOptions.map((url, index) => (
-                        <Image
+                        <img
                           key={index}
-                          src={url} // Image source URL
-                          alt={`Avatar ${index}`} // Image alt text
-                          width={64}  // Set width of the image
-                          height={64} // Set height of the image
-                          className={`rounded-full border-2 cursor-pointer transition hover:scale-110 ${
+                          src={url}
+                          alt={`Avatar ${index}`}
+                          className={`w-16 h-16 rounded-full border-2 cursor-pointer transition hover:scale-110 ${
                             formData.avatar === url ? 'border-blue-500' : 'border-transparent'
                           }`}
                           onClick={() => setFormData({ ...formData, avatar: url })}
                         />
-
                       ))}
                     </div>
                   </DialogContent>
@@ -121,14 +117,11 @@ const AddUserPage = () => {
                 {/* Selected avatar preview */}
                 {formData.avatar && (
                   <div className="mt-4">
-                    <Image
+                    <img
                       src={formData.avatar}
                       alt="Selected avatar"
-                      width={80}  // Set width for the avatar image
-                      height={80} // Set height for the avatar image
-                      className="mx-auto rounded-full border border-gray-300"
+                      className="w-20 h-20 mx-auto rounded-full border border-gray-300"
                     />
-
                   </div>
                 )}
               </div>
